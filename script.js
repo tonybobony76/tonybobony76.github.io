@@ -1,6 +1,4 @@
 const video = document.getElementById("bgVideo");
-const layerA = document.getElementById("layerA");
-const layerB = document.getElementById("layerB");
 const countdown = document.getElementById("countdown");
 
 // 6 hours total duration
@@ -23,18 +21,14 @@ video.addEventListener("loadedmetadata", () => {
 
     let progress = (now - startTime) / TOTAL_TIME;
 
-    // clamp 0–1
+    // clamp
     if (progress > 1) progress = 1;
     if (progress < 0) progress = 0;
 
-    // VIDEO SCRUB (key part)
+    // scrub video across 6 hours
     video.currentTime = progress * duration;
 
-    // IMAGE CROSSFADE
-    layerA.style.opacity = 1 - progress;
-    layerB.style.opacity = progress;
-
-    // COUNTDOWN
+    // countdown
     const remaining = Math.max(TOTAL_TIME - (now - startTime), 0);
 
     const seconds = Math.floor(remaining / 1000);
