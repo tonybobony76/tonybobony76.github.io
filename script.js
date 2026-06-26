@@ -4,12 +4,9 @@ const countdown = document.getElementById("countdown");
 // 6 hours total duration
 const TOTAL_TIME = 6 * 60 * 60 * 1000;
 
-// persistent start time (survives refresh)
-const startTime =
-  parseInt(localStorage.getItem("startTime")) ||
-  Date.now();
-
-localStorage.setItem("startTime", startTime);
+// GLOBAL FIXED START TIME
+// 12:00 AM CST June 26, 2026 = 06:00 UTC
+const startTime = new Date("2026-06-26T06:00:00Z").getTime();
 
 video.addEventListener("loadedmetadata", () => {
   const duration = video.duration;
@@ -19,16 +16,17 @@ video.addEventListener("loadedmetadata", () => {
   function update() {
     const now = Date.now();
 
+    // progress across 6-hour event
     let progress = (now - startTime) / TOTAL_TIME;
 
-    // clamp
-    if (progress > 1) progress = 1;
+    // clamp 0–1
     if (progress < 0) progress = 0;
+    if (progress > 1) progress = 1;
 
-    // scrub video across 6 hours
+    // scrub video across full duration
     video.currentTime = progress * duration;
 
-    // countdown
+    // countdown (only runs during event window)
     const remaining = Math.max(TOTAL_TIME - (now - startTime), 0);
 
     const seconds = Math.floor(remaining / 1000);
