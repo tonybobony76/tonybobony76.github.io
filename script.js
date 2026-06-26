@@ -1,33 +1,37 @@
 const video = document.getElementById("bgVideo");
 const countdown = document.getElementById("countdown");
 
-// 6 hours total duration
 const TOTAL_TIME = 6 * 60 * 60 * 1000;
 
-// GLOBAL FIXED START TIME
-// 12:00 AM CST June 26, 2026 = 06:00 UTC
+// 12 AM CST = 06:00 UTC
 const startTime = new Date("2026-06-26T06:00:00Z").getTime();
 
 video.addEventListener("loadedmetadata", () => {
   const duration = video.duration;
-
   video.play();
 
   function update() {
     const now = Date.now();
+    const elapsed = now - startTime;
 
-    // progress across 6-hour event
-    let progress = (now - startTime) / TOTAL_TIME;
+    // BEFORE START
+    if (elapsed < 0) {
+      video.currentTime = 0;
+      countdown.textContent = "Starting soon";
+      requestAnimationFrame(update);
+      return;
+    }
 
-    // clamp 0–1
-    if (progress < 0) progress = 0;
-    if (progress > 1) progress = 1;
+    let progress = elapsed / TOTAL_TIME;
 
-    // scrub video across full duration
+    // AFTER END
+    if (progress >= 1) {
+      progress = 1;
+    }
+
     video.currentTime = progress * duration;
 
-    // countdown (only runs during event window)
-    const remaining = Math.max(TOTAL_TIME - (now - startTime), 0);
+    const remaining = Math.max(TOTAL_TIME - elapsed, 0);
 
     const seconds = Math.floor(remaining / 1000);
     const h = Math.floor(seconds / 3600);
