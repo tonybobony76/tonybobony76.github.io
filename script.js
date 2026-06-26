@@ -1,33 +1,51 @@
-const startTime = new Date("2026-06-26T00:00:00Z").getTime();
-const endTime   = new Date("2026-07-10T00:00:00Z").getTime();
-
+const video = document.getElementById("bgVideo");
 const layerA = document.getElementById("layerA");
 const layerB = document.getElementById("layerB");
 const countdown = document.getElementById("countdown");
 
-function update() {
-  const now = Date.now();
+// 6 hours total duration
+const TOTAL_TIME = 6 * 60 * 60 * 1000;
 
-  let progress = (now - startTime) / (endTime - startTime);
-  progress = Math.min(Math.max(progress, 0), 1);
+// persistent start time (survives refresh)
+const startTime =
+  parseInt(localStorage.getItem("startTime")) ||
+  Date.now();
 
-  // Crossfade images
-  layerA.style.opacity = 1 - progress;
-  layerB.style.opacity = progress;
+localStorage.setItem("startTime", startTime);
 
-  // Countdown
-  const remaining = Math.max(endTime - now, 0);
-  const seconds = Math.floor(remaining / 1000);
+video.addEventListener("loadedmetadata", () => {
+  const duration = video.duration;
 
-  const d = Math.floor(seconds / 86400);
-  const h = Math.floor((seconds % 86400) / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = seconds % 60;
+  video.play();
 
-  countdown.textContent =
-    `${d}d ${h}h ${m}m ${s}s`;
+  function update() {
+    const now = Date.now();
 
-  requestAnimationFrame(update);
-}
+    let progress = (now - startTime) / TOTAL_TIME;
 
-update();
+    // clamp 0–1
+    if (progress > 1) progress = 1;
+    if (progress < 0) progress = 0;
+
+    // VIDEO SCRUB (key part)
+    video.currentTime = progress * duration;
+
+    // IMAGE CROSSFADE
+    layerA.style.opacity = 1 - progress;
+    layerB.style.opacity = progress;
+
+    // COUNTDOWN
+    const remaining = Math.max(TOTAL_TIME - (now - startTime), 0);
+
+    const seconds = Math.floor(remaining / 1000);
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+
+    countdown.textContent = `${h}h ${m}m ${s}s`;
+
+    requestAnimationFrame(update);
+  }
+
+  update();
+});
