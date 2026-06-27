@@ -6,23 +6,19 @@ html, body {
     background: black;
 }
 
-#stage {
+/* FINAL IMAGE */
+#base {
     position: fixed;
     inset: 0;
-}
 
-/* FINAL IMAGE (REVEALED AT END) */
-#base {
-    position: absolute;
-    inset: 0;
     background-image: url("media/final.jpg");
     background-size: cover;
     background-position: center;
 }
 
-/* MASK LAYER (starts opaque, fades out) */
+/* REVEAL MASK */
 #mask {
-    position: absolute;
+    position: fixed;
     inset: 0;
 
     background-image: url("media/mask.png");
@@ -30,12 +26,11 @@ html, body {
     background-position: center;
 
     opacity: 1;
-    transition: opacity 0.2s linear;
 }
 
 /* COUNTDOWN */
 #overlay {
-    position: absolute;
+    position: fixed;
     inset: 0;
 
     display: flex;
