@@ -3,25 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Countdown</title>
+    <title>Reveal Countdown</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<video
-    id="bgVideo"
-    muted
-    autoplay
-    playsinline
-    webkit-playsinline
-    preload="auto">
-    <source src="media/bg.mp4" type="video/mp4">
-</video>
+<div id="stage">
 
-<div id="overlay">
-    <div id="countdown"></div>
+    <!-- BASE IMAGE (final reveal) -->
+    <div id="base"></div>
+
+    <!-- MASK LAYER (fog/blur that fades away) -->
+    <div id="mask"></div>
+
+    <!-- COUNTDOWN -->
+    <div id="overlay">
+        <div id="countdown"></div>
+    </div>
+
 </div>
 
 <script src="script.js"></script>
