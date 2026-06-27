@@ -1,11 +1,11 @@
-const video = document.getElementById("bgVideo");
 const countdown = document.getElementById("countdown");
+const mask = document.getElementById("mask");
 
-// 12:00 AM CDT June 27, 2026 (UTC)
+// 12:00 AM CDT June 27, 2026 (UTC 05:00)
 const EVENT_START = new Date("2026-06-27T05:00:00Z").getTime();
-const EVENT_DURATION = 6 * 60 * 60 * 1000;
 
-let started = false;
+// 6 hours reveal
+const EVENT_DURATION = 6 * 60 * 60 * 1000;
 
 function format(ms) {
     const total = Math.max(0, Math.floor(ms / 1000));
@@ -17,48 +17,29 @@ function format(ms) {
     return `${h}h ${m}m ${s}s`;
 }
 
-function updateCountdown() {
+function update() {
     const now = Date.now();
 
+    // BEFORE START
     if (now < EVENT_START) {
         countdown.textContent = format(EVENT_START - now);
-    } else {
-        const remaining = Math.max(EVENT_DURATION - (now - EVENT_START), 0);
-        countdown.textContent = format(remaining);
-    }
-}
-
-function tryStartVideo() {
-    if (started) return;
-    if (!video.duration || !isFinite(video.duration)) return;
-
-    const now = Date.now();
-
-    if (now < EVENT_START) {
-        video.pause();
-        video.currentTime = 0;
+        mask.style.opacity = 1;
+        requestAnimationFrame(update);
         return;
     }
 
-    started = true;
+    // DURING EVENT
+    const elapsed = now - EVENT_START;
+    const progress = Math.min(elapsed / EVENT_DURATION, 1);
 
-    // VERY IMPORTANT:
-    // stretch video across full event duration
-    const speed = video.duration / (EVENT_DURATION / 1000);
+    // MASK FADES OUT OVER TIME
+    mask.style.opacity = 1 - progress;
 
-    video.playbackRate = speed;
+    // COUNTDOWN
+    const remaining = Math.max(EVENT_DURATION - elapsed, 0);
+    countdown.textContent = format(remaining);
 
-    video.play().catch(() => {});
+    requestAnimationFrame(update);
 }
 
-video.addEventListener("loadedmetadata", () => {
-    video.currentTime = 0;
-    video.pause();
-});
-
-setInterval(() => {
-    updateCountdown();
-    tryStartVideo();
-}, 500);
-
-updateCountdown();
+update();
