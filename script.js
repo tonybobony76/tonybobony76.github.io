@@ -4,7 +4,7 @@ const mask = document.getElementById("mask");
 // June 27, 2026 12:00 AM CDT (UTC 05:00)
 const EVENT_START = new Date("2026-06-27T05:00:00Z").getTime();
 
-// 6 hours duration
+// 6 hours
 const EVENT_DURATION = 6 * 60 * 60 * 1000;
 
 function format(ms) {
@@ -17,11 +17,6 @@ function format(ms) {
     return `${h}h ${m}m ${s}s`;
 }
 
-// easing function (IMPORTANT: makes midpoint visible)
-function ease(progress) {
-    return Math.pow(progress, 1.8);
-}
-
 function update() {
     const now = Date.now();
 
@@ -29,28 +24,18 @@ function update() {
     if (now < EVENT_START) {
         countdown.textContent = format(EVENT_START - now);
         mask.style.opacity = 1;
-        mask.style.filter = "blur(12px) contrast(1.2)";
         requestAnimationFrame(update);
         return;
     }
 
     // DURING EVENT
     const elapsed = now - EVENT_START;
-    const progressRaw = Math.min(elapsed / EVENT_DURATION, 1);
+    const progress = Math.min(elapsed / EVENT_DURATION, 1);
 
-    const progress = ease(progressRaw);
+    // SIMPLE CLEAN TAKEOVER
+    mask.style.opacity = 1 - progress;
 
-    // REVEAL EFFECT (THIS IS THE IMPORTANT PART)
-    const opacity = 1 - progress;
-    const blur = 12 * (1 - progress);
-    const contrast = 1 + progress * 0.8;
-
-    mask.style.opacity = opacity;
-    mask.style.filter = `blur(${blur}px) contrast(${contrast})`;
-
-    // COUNTDOWN
-    const remaining = Math.max(EVENT_DURATION - elapsed, 0);
-    countdown.textContent = format(remaining);
+    countdown.textContent = format(EVENT_DURATION - elapsed);
 
     requestAnimationFrame(update);
 }
